@@ -7,6 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FooterComponent  {
 
-	autor: any = {nombre: 'Santiago', apellido: 'Ocampo'};
+	autor: any = {nombre: 'Santiago', apellido: 'Ocampo Jimenez'};
 
 }

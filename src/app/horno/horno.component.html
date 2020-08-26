@@ -1,25 +1,32 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <!-- Navbar text-->
-  <span class="navbar-text">
-    SCADA sistema calentamiento de pan
-  </span>
+    <!-- Navbar text-->
+    <span class="navbar-text">
+        SCADA sistema calentamiento de pan
+    </span>
 
 </nav>
 
-<div class="p-3 col-sm-6" >
-  <img src={{rutaImagen}} class="mx-auto d-block" style="width:30%">
-  <button type="button" (click)="setHabilitar()" (click)="comenzarTiempo()" class="btn btn-primary mx-auto d-block">{{habilitar == true? 'encender': 'apagar'}}</button> 
-
-  <div class="container p-3" *ngIf="habilitar == false">
-    <h2 class="alert-info">Tiempo de espera: {{tiempoHorno}} segundos</h2>
-  	<h2 class="active" [ngClass]="{'temperatura-correcta': temperatura>=160, 'temperatura-elevada': temperatura > 180}" >Temperatura: {{temperatura}} </h2>
-  	<div class="alert alert-danger" *ngIf="temperatura > 180">
-  		<p>la temperatura está demasiado elevada</p>
-  	</div>
-
-
-
-  	<button type="button" class="btn btn-success" (click)="setAumentarTemperatura()"> + </button>
-  	<button type="button" class="btn btn-danger" (click)="setDisminuirTemperatura()"> - </button>
-  </div>
+<div class="row">
+    <div class="p-3 col-sm-6">
+        <img src={{rutaImagen}} class="mx-auto d-block" style="width:30%">
+        <button type="button" (click)="setHabilitar()" (click)="comenzarTiempo()" class="btn btn-primary mx-auto d-block">{{habilitar == true? 'encender': 'apagar'}}</button>
+        <div class="container p-3">
+            <h2 class="active" [ngClass]="{'temperatura-correcta': temperatura>=160, 'temperatura-elevada': temperatura > 180}">Temperatura: {{temperatura}} </h2>
+            <div class="alert alert-danger" *ngIf="temperatura > 180">
+                <p>la temperatura está demasiado elevada</p>
+            </div>
+            <button type="button" class="btn btn-success" (click)="setAumentarTemperatura()"> + </button>
+            <button type="button" class="btn btn-danger" (click)="setDisminuirTemperatura()"> - </button>
+        </div>
+        
+        <div class="container p-3" *ngIf="habilitar == false">
+            <h2 class="text-primary">Tiempo de espera: {{tiempoHorno}} segundos</h2>
+        </div>
+    </div>
+    <div class="p-3 col-sm-5" *ngIf="habilitar == false" >
+        <h3  class="active mx-auto d-block" >Grafica</h3>
+        <div id="divChart">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
 </div>
