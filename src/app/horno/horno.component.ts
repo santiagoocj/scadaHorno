@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import  { timer } from 'rxjs';
 import { Chart } from 'node_modules/chart.js';
+import { HornoService } from './horno.service';
+import { Horno } from './horno';
+
+
 
 @Component({
   selector: 'app-horno',
@@ -10,93 +14,86 @@ import { Chart } from 'node_modules/chart.js';
 export class HornoComponent implements OnInit {
 
 	habilitar: boolean = true;
-	rutaImagen: String = '../../assets/img/horno vacio.jpg';
-	temperatura: number = 160;
-	temperaturaAumentada: number = 10;
-  tiempoHorno;
-  intervalo;
-  pintarGrafica: number[] = [];
-  voltaje: number = 3;
-  periodoMuestreo: number = 2;
-  periodoMuestreoGrafica: number[] = [];
-  aumentoPeriodoMuestreo: number = 2;
+  muestraVoltaje: number;//variable auxiliar para desconectar y conectar el voltaje
 
+	model: Horno = {
+    rutaImagen: '../../assets/img/horno vacio.jpg', 
+    temperatura: 170,
+    tiempoHorno: 25,
+    intervalo: 0,
+    pintarGrafica: [],
+    voltaje: 110,
+    periodoMuestreo: 2, 
+    periodoMuestreoGrafica: [],
+    aumentoPeriodoMuestreo:  2,
+  };
 
-  constructor() { }
+  constructor(private hornoService: HornoService) { }
 
   ngOnInit(): void {
 
   }
 
   setHabilitar(): void{
-  	this.habilitar = (this.habilitar==true)? false: true;
-  	this.rutaImagen = (this.habilitar == true)? '../../assets/img/horno vacio.jpg':'../../assets/img/horno llenandose.gif';
+    this.habilitar = (this.habilitar == true)? false : true;
+    this.terminarProceso();
+  	this.model.rutaImagen = (this.habilitar == true)? '../../assets/img/horno vacio.jpg':'../../assets/img/horno llenandose.gif';
     if(this.habilitar == true)
-      this.pintarGrafica.length = 0;
+      this.model.pintarGrafica.length = 0;
     
   }
 
-  setAumentarTemperatura(): number{
- 	return this.temperatura = this.temperatura + this.temperaturaAumentada;
+
+  iniciarProceso(): void{
+    this.hornoService.comenzarTiempo(this.habilitar, this.model);
   }
 
-  setDisminuirTemperatura(): number{
-    return this.temperatura = (this.temperatura == 0)? 0: this.temperatura - this.temperaturaAumentada;
+  terminarProceso(): void{//restaura el modelo a los valores predeterminados para cuando se apaga el horno
+    if(this.habilitar == true){
+      this.model = {
+      rutaImagen: '../../assets/img/horno vacio.jpg', 
+      temperatura: 170,
+      tiempoHorno: 25,
+      intervalo: 0,
+      pintarGrafica: [],
+      voltaje: 110,
+      periodoMuestreo: 2, 
+      periodoMuestreoGrafica: [],
+      aumentoPeriodoMuestreo:  2,
+      };
+    }
   }
 
-  comenzarTiempo(): void{
-    if(this.habilitar == false){
-      clearTimeout(this.intervalo);
-      this.tiempoHorno = 0;
-      this.intervalo = setInterval(() =>{
-        if(this.tiempoHorno <= 25) {
-          this.intervaloTiempoGrafica(this.tiempoHorno);
-          this.tiempoHorno++;
-      } else {
-        clearTimeout(this.intervalo);
-        alert("el proceso termino con exito");
+  validarEntradasUsuario():void{
+    if(this.habilitar == true){
+      if(this.model.temperatura == null){
+        alert("el campo temperatura es obligatorio");
+      }else if(this.model.temperatura <= 160 || this.model.temperatura >= 180){
+        alert("la temperatura de referencia esta en 160 y 180 grados");
+      }else if(this.model.tiempoHorno == null){
+        alert("el campo tiempo es obligatorio");
+      }else if(this.model.periodoMuestreo == null){
+        alert("el campo periodo de muestreo es obligatorio");
       }
-     }, 1000);
+      else{
+        this.setHabilitar();
+        this.iniciarProceso();
+        this.muestraVoltaje = this.model.voltaje;
+      }
     }else{
-      clearTimeout(this.intervalo);
-    }
-  }
-
-  intervaloTiempoGrafica(tiempo: number): void{
-    let verificar = this.aumentoPeriodoMuestreo;
-    if(verificar == tiempo){
-      this.temperatura = this.voltaje*this.periodoMuestreo + this.temperatura;
-      this.periodoMuestreoGrafica.push(this.aumentoPeriodoMuestreo);
-      this.pintarGrafica.push(this.temperatura);
-      this.aumentoPeriodoMuestreo = this.periodoMuestreo + this.aumentoPeriodoMuestreo;
-      this.crearGrafica();
+      this.setHabilitar();
+      this.iniciarProceso();
     }
 
   }
 
-
-
-  crearGrafica():void{
-    let chart = new Chart("myChart", {
-    type: 'line',
-    data: {
-        datasets: [{
-            label: 'Temperatura/Tiempo',
-            data: this.pintarGrafica
-        }],
-        labels: this.periodoMuestreoGrafica
-    },
-    options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    suggestedMin: 50,
-                    suggestedMax: 190
-                }
-            }]
-        }
+  desconectarVoltaje(): void{
+    if(this.model.voltaje != 0){
+      this.model.voltaje = 0;
+    }else{
+      this.model.voltaje = this.muestraVoltaje;
     }
-  });
+
   }
 
 }

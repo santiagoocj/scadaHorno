@@ -8,23 +8,43 @@
 
 <div class="row">
     <div class="p-3 col-sm-6">
-        <img src={{rutaImagen}} class="mx-auto d-block" style="width:30%">
-        <button type="button" (click)="setHabilitar()" (click)="comenzarTiempo()" class="btn btn-primary mx-auto d-block">{{habilitar == true? 'encender': 'apagar'}}</button>
-        <div class="container p-3">
-            <h2 class="active" [ngClass]="{'temperatura-correcta': temperatura>=160, 'temperatura-elevada': temperatura > 180}">Temperatura: {{temperatura}} </h2>
-            <div class="alert alert-danger" *ngIf="temperatura > 180">
-                <p>la temperatura está demasiado elevada</p>
-            </div>
-            <button type="button" class="btn btn-success" (click)="setAumentarTemperatura()"> + </button>
-            <button type="button" class="btn btn-danger" (click)="setDisminuirTemperatura()"> - </button>
-        </div>
+        <img src={{model.rutaImagen}} class="mx-auto d-block" style="width:30%">
         
-        <div class="container p-3" *ngIf="habilitar == false">
-            <h2 class="text-primary">Tiempo de espera: {{tiempoHorno}} segundos</h2>
-        </div>
+        <form role="form" (ngSubmit)="validarEntradasUsuario()" class="p-3">
+            <div class="container" *ngIf="habilitar == true">
+                <div class="form-group">
+                    <label for="temperatura">
+                        Temperatura 
+                    </label>
+                    <input type="number" class="form-control" #temperatura="ngModel" [(ngModel)]="model.temperatura" name="temperatura" required />
+                </div>
+                <div class="form-group">
+                    <label for="voltaje">
+                        Voltaje
+                    </label>
+                    <input type="number" class="form-control" #voltaje="ngModel" [(ngModel)]="model.voltaje" name="voltaje" required />
+                </div>
+                <div class="form-group">
+                    <label for="Tiempo">
+                        Tiempo
+                    </label>
+                    <input type="number" class="form-control" #tiempoHorno="ngModel" [(ngModel)]="model.tiempoHorno" name="tiempoHorno" required />
+                </div>
+                <div class="form-group">
+                    <label for="periodoMuestreo">
+                        Periodo de Muestreo 
+                    </label>
+                    <input type="number" class="form-control" #periodoMuestreo="ngModel" [(ngModel)]="model.periodoMuestreo" name="periodoMuestreo" required />
+                </div>
+            </div>
+            <button type="submit"  class="btn btn-primary mx-auto d-block">{{habilitar == true? 'encender': 'apagar'}}</button>
+        </form>
+
+        <button type="button" class="btn btn-danger mx-auto d-block" *ngIf="habilitar == false" (click)="desconectarVoltaje()">{{model.voltaje != 0? 'Desconectar Voltaje' : 'Conectar Voltaje'}}</button>
+
     </div>
-    <div class="p-3 col-sm-5" *ngIf="habilitar == false" >
-        <h3  class="active mx-auto d-block" >Grafica</h3>
+    <div class="p-3 col-sm-5" *ngIf="habilitar == false">
+        <h3 class="active mx-auto d-block">Grafica</h3>
         <div id="divChart">
             <canvas id="myChart"></canvas>
         </div>
